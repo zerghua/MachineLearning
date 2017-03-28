@@ -63,10 +63,22 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+% Theta1  25 X 401
+% Theta2  10 X 26
 
+a1 = [ones(m, 1) X];   % 5000 X 401
 
+z2 = a1 * Theta1'; 
+a2 = sigmoid(z2);      % 5000 X 25 
 
+z3 = [ones(m, 1) a2] * Theta2'; 
+a3 = sigmoid(z3);      % 5000 X 10 
 
+Y = eye(num_labels)(y,:);   % important   5000 X 10 
+
+regularization =(sum(sum(Theta1(:, 2:end) .^ 2)) + sum(sum(Theta2(:, 2:end) .^ 2)))*lambda/(2*m);
+
+J = sum(sum(-Y.*log(a3)-(1-Y).*log(1-a3)))/m + regularization;
 
 
 
