@@ -63,18 +63,19 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
-% Theta1  25 X 401
-% Theta2  10 X 26
+% Theta1  [25 X 401]
+% Theta2  [10 X 26]
 
-a1 = [ones(m, 1) X];   % 5000 X 401
+a1 = [ones(m, 1) X];   % [5000 X 401]
 
-z2 = a1 * Theta1'; 
-a2 = sigmoid(z2);      % 5000 X 25 
+z2 = a1 * Theta1';     % [5000 X 401] * [401 X 25]  
+a2 = sigmoid(z2);      % bug, don't sigmoid the bias parameter
+a2 = [ones(m, 1) a2];  % [5000 X 26]
 
-z3 = [ones(m, 1) a2] * Theta2'; 
-a3 = sigmoid(z3);      % 5000 X 10 
+z3 = a2 * Theta2';   % [5000 X 26] * [26 X 10]
+a3 = sigmoid(z3);                 % [5000 X 10] 
 
-Y = eye(num_labels)(y,:);   % important   5000 X 10 
+Y = eye(num_labels)(y,:);   % important   [5000 X 10] 
 
 regularization =(sum(sum(Theta1(:, 2:end) .^ 2)) + sum(sum(Theta2(:, 2:end) .^ 2)))*lambda/(2*m);
 
@@ -84,12 +85,49 @@ J = sum(sum(-Y.*log(a3)-(1-Y).*log(1-a3)))/m + regularization;
 
 
 
+% simplified code for backpropagation algorithm
+%{  
+delta_3 = a3 - Y;                                              % [5000 X 10]
+delta_2 = (delta_3 * Theta2(:,2:end)) .* sigmoidGradient(z2);  % [5000 X 10] * [10 X 25] .* [5000 X 25] = [5000 X 25]
+
+
+delta_cap1 = delta_2' * a1;    %[5000 X 25]' * [5000 X 401]
+delta_cap2 = delta_3' * a2;    %[5000 X 10]' * [5000 X 26]
+
+
+Theta1_grad = ((1/m) * delta_cap1) ;
+Theta2_grad = ((1/m) * delta_cap2) ;
+%}
 
 
 
+% backpropagation algorithm
+for t = 1:m
+    % step 1
+    a1 = [1 X(t, :)];       % [1 X 401]
+    
+    z2 = a1 * Theta1';      % [1 X 401] * [25 X 401]' = [1 X 25]
+    a2 = sigmoid(z2);       % [1 X 25]  bug, don't sigmoid the bias parameter
+    a2 = [1 a2];            % [1 X 26]
 
+    z3 = a2 * Theta2';      % [1 X 26] * [10 X 26]' = [1 X 10]
+    a3 = sigmoid(z3);       % [1 X 10] 
+    
+    % step 2
+    delta3 = a3 - Y(t, :);     % [1 X 10]   Y(t) is bug!!!
+    
+    % step 3 
+    delta2 = (delta3 * Theta2(: , 2:end)) .* sigmoidGradient(z2); %  [1 X 10]* [10 X 25] .* [1 X 25] =  [1 X 25]
 
+    
+    % step 4
+    Theta1_grad = Theta1_grad + delta2' * a1; % [1 X 25]' * [1 X 401] = [25 X 401]
+    Theta2_grad = Theta2_grad + delta3' * a2; % [1 X 10]' * [1 X 26] = [10 X 26]
+end 
 
+% step 5
+Theta1_grad = Theta1_grad/m;
+Theta2_grad = Theta2_grad/m;
 
 
 % -------------------------------------------------------------
