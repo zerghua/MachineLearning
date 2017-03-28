@@ -86,7 +86,7 @@ J = sum(sum(-Y.*log(a3)-(1-Y).*log(1-a3)))/m + regularization;
 
 
 % simplified code for backpropagation algorithm
-%{  
+  
 delta_3 = a3 - Y;                                              % [5000 X 10]
 delta_2 = (delta_3 * Theta2(:,2:end)) .* sigmoidGradient(z2);  % [5000 X 10] * [10 X 25] .* [5000 X 25] = [5000 X 25]
 
@@ -97,11 +97,12 @@ delta_cap2 = delta_3' * a2;    %[5000 X 10]' * [5000 X 26]
 
 Theta1_grad = ((1/m) * delta_cap1) ;
 Theta2_grad = ((1/m) * delta_cap2) ;
-%}
 
 
 
-% backpropagation algorithm
+
+% backpropagation algorithm naive and very slow 
+%{
 for t = 1:m
     % step 1
     a1 = [1 X(t, :)];       % [1 X 401]
@@ -128,7 +129,7 @@ end
 % step 5
 Theta1_grad = Theta1_grad/m;
 Theta2_grad = Theta2_grad/m;
-
+%}
 
 % regularization, replace the first column of theta to 0
 t1 = [zeros(size(Theta1, 1), 1) Theta1(: , 2:end)];
