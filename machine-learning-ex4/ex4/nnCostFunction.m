@@ -130,6 +130,14 @@ Theta1_grad = Theta1_grad/m;
 Theta2_grad = Theta2_grad/m;
 
 
+% regularization, replace the first column of theta to 0
+t1 = [zeros(size(Theta1, 1), 1) Theta1(: , 2:end)];
+t2 = [zeros(size(Theta2, 1), 1) Theta2(: , 2:end)];
+
+Theta1_grad = Theta1_grad + t1 * lambda / m;
+Theta2_grad = Theta2_grad + t2 * lambda / m;
+
+
 % -------------------------------------------------------------
 
 % =========================================================================
