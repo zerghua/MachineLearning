@@ -23,7 +23,23 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+min_mean = intmax ; 
 
+for trial_c = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30],
+    for trial_sigma = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30],
+        
+        model = svmTrain(X, y, trial_c, @(x1, x2) gaussianKernel(x1, x2, trial_sigma)); 
+        predictions = svmPredict(model, Xval);   
+        cur_mean = mean(double(predictions ~= yval)) ;
+        
+        if  cur_mean < min_mean,
+            min_mean = cur_mean ; 
+            C = trial_c;
+            sigma = trial_sigma;         
+        end
+        
+    end
+end
 
 
 
