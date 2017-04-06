@@ -21,10 +21,13 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
+m = size(X, 1) ; 
 
-
-
-
+for i = 1: m, 
+    item = X(i, :);
+    [val, index] = min(sum((item - centroids).^ 2, 2));
+    idx(i) = index ; 
+end
 
 
 % =============================================================
